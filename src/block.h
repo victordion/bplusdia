@@ -5,57 +5,87 @@
 class Block {
   public:
     Block();
+
+    Block(long self_id) : _self_id(self_id) {
+        
+    }
     
+    long get_self_id() {
+        return _self_id;
+    }
+    
+    long get_parent_id() {
+        return _parent_id;
+    }
+
+    void set_parent_id(long parent_id) {
+        _parent_id = parent_id;
+    }
+    virtual bool oversize();
+    virtual void add_key_value(long key, long value);
+    virtual std::vector<long> get_children_keys();
+    virtual std::vector<long> get_children_ids();
+    virtual std::vector<Block*> get_children_block_ptrs();
+
   protected:
     // in bytes
     virtual long size() = 0;
 
-    long get_self_id();
-
-    virtual bool is_oversize() = 0;
-  
-  private:
     // Size in bytes
     long _size;
     // Id of this block
-    long self_id;
+    long _self_id;
 
-    long parent_id;
-
-    long n_children;
-
-    long* children_ids;
-
-    long* children_keys;
-    
-    BlockType type; 
+    long _parent_id;
 
 };
-
 
 class RootBlock : public Block {
   public:
     RootBlock();
-    void add_key(long key);
-    void delete_key(long key);
-    // SPlit into 3 blocks
-    // 1st block: new root
-    // 2nd block: left child of new root
-    // 3rd block: right child of new root
-    std::vector<Block> split();
+    RootBlock(long self_id) : Block(self_id) {
+     
+    }
 
-    bool is_oversize();
+    void add_key_value(long key, long value);
+    void remove_key(long key);
+    long get_child_id_by_key(long key);
+
+    long size();
+    
+    std::vector<long> get_children_keys();
+    std::vector<long> get_children_ids();
+    std::vector<Block*> get_children_block_ptrs();
+
   private:
+  
+    std::vector<long> _children_keys;
+    std::vector<long> _children_ids;
+    std::vector<Block*> _children_block_ptrs;
 };
 
 class InternalBlock : public Block {
   public:
     InternalBlock();
-    void add_key(long key);
-    void delete_key(long key);    
-
+    void add_key_value(long key, long value);
+    void remove_key(long key);    
+    long get_child_id_by_key(long key);
+    
+    long get_next_sibling_id();
+    
+    long size();
+    
+    std::vector<long> get_children_keys;
+    std::vector<long> get_children_ids;
+    std::vector<Block*> get_children_block_ptrs;
+  
   private:
-
+    
+    std::vector<long> _children_keys;
+    std::vector<long> _children_ids;
+    std::vector<Block*> _children_block_ptrs;
+    
+    long _next_sibling_id;
 };
 
 class DataBlock : Block {
@@ -66,12 +96,13 @@ class DataBlock : Block {
     void remove_key_value(long key);
     long get_value_by_key(long key);
     long size(); 
-    std::vector<DataBlock> split(long* pivot_key);
+    long get_next_sibling_id();
 
   private:
-    std::vector<std::pair<long, long> > _data;
+    std::vector<long> _keys;
+    std::vector<long> _values;
     
-    long right_sibling_id;
+    long _next_sibling_id;
 };
 
 

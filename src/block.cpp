@@ -7,30 +7,37 @@ Block::Block() {
 
 // An implementation assuming no duplicate key will be added
 void DataBlock::add_key_value(long key, long value) {
-    if(_data.empty()) {
-        _data.push_back(std::pair<long,long>(key, value));
+    if(_keys.empty()) {
+        _keys.push_back(key);
+        _values.push_back(value);
     } else {
-        for(auto it = _data.begin(); it != _data.end(); ++it) {
-            if( key < (*it).first) {
-                _data.insert(it,std::pair<long,long>(key, value));
+        for(size_t i = 0; i < _keys.size(); ++i) {
+            // Overwrite
+            if(key == _keys[i]) {
+                _values[i] = value;
+                return;
+            }
+            else if(key < _keys[i]) {
+                _keys.insert(_keys.begin() + i, key);
+                _values.insert(_values.begin() + i, value);
                 return;
             }
         }
     }
-    _data.push_back(std::pair<long,long>(key, value));
-
+    _keys.push_back(key);
+    _values.push_back(value);
 }
 
 
 long DataBlock::size() {
-    return sizeof(long) * (_data.size() + 1);
+    return 2 * sizeof(long) * (_keys.size()) + sizeof(long);
 }
 
 
 long DataBlock::get_value_by_key(long key) {
-    for(size_t i = 0; i < _data.size(); ++i) {
-        if(key == _data[i].first) {
-            return _data[i].second;
+    for(size_t i = 0; i < _keys.size(); ++i) {
+        if(key == _keys[i]) {
+            return _values[i];
         }
     }
     // indicates not found
