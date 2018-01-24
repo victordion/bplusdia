@@ -88,7 +88,7 @@ class InternalBlock : public Block {
     long _next_sibling_id;
 };
 
-class DataBlock : Block {
+class DataBlock : public Block {
 
   public:
 
