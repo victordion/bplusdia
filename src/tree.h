@@ -13,7 +13,7 @@ namespace Bplusdia {
         long get_value_by_key(long key);
     
         void persist();
-        void init(std::string file_name, long block_size, long n_blocks);
+        void init_new(std::string file_name, long block_size, long n_blocks, long b);
         void set_fd(int fd);
     
       protected:
@@ -29,6 +29,7 @@ namespace Bplusdia {
         long _block_size;
         long _n_blocks;
         long _n_used_blocks;
+        long _b;
      
         // a bit map to store indices that are currently occupied blocks
         std::vector<bool> _used;

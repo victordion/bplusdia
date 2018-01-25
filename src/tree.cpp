@@ -6,6 +6,7 @@
 #include <string>
 #include <typeinfo>
 #include <string.h>
+#include <cstring>
 
 namespace Bplusdia {
     
@@ -13,19 +14,56 @@ namespace Bplusdia {
     
     }
     
-    void Tree::init(std::string file_name, long block_size, long n_blocks) {
-    
+    void Tree::init_new(std::string file_name, long block_size, long n_blocks, long b) {
+        _b = b;
         _n_blocks = n_blocks;
         _block_size = block_size;
         _n_used_blocks = 0;
         _used.resize(_n_blocks);
      
-        _fd = open(file_name.c_str(), O_RDWR);
-        off_t total_size = (off_t) block_size * n_blocks;
-        lseek(_fd, total_size, SEEK_SET);
+        if (access(file_name.c_str(), F_OK ) != -1) {
+            throw "File exists. Exiting.";
+        }
+
+        _fd = open(file_name.c_str(), O_RDWR | O_CREAT, 0666);
+        
+        /* Fill in file metadata */
+ 
+        lseek(_fd, 0, SEEK_SET);
+        write(_fd, "Bplusdia", 8);
+        
+        lseek(_fd, 16, SEEK_SET);
+        write(_fd, (void*) &n_blocks, 8);
+        
+        lseek(_fd, 24, SEEK_SET);
+        write(_fd, (void*) &block_size, 8);
     
-        const char* place_holder = "\0";
-        write(_fd, (const void*)place_holder, 1);
+        lseek(_fd, 32, SEEK_SET);
+        write(_fd, (void*) &b, 8);
+
+        long root_block_id = 0;
+        lseek(_fd, 40, SEEK_SET);
+        write(_fd, (void*) &root_block_id, 8);
+       
+        long max_n_blocks = 8192;
+        long n_bytes_in_bitmap = max_n_blocks / 8; 
+        char bitmap[n_bytes_in_bitmap];
+        memset(bitmap, 0, n_bytes_in_bitmap);         
+        lseek(_fd, 1024, SEEK_SET);
+        write(_fd, (void*) bitmap, n_bytes_in_bitmap);
+
+        long block_data_base_offset = 1024 + max_n_blocks / 8;
+        long block_data_size = _n_blocks * _block_size;
+       
+        /* Seek to Block 0, i.e. root block */
+        lseek(_fd, block_data_base_offset, SEEK_SET);
+        write(_fd, (void*) &root_block_id, 8);
+
+
+        // Seek to end of file and write something there
+        lseek(_fd, block_data_base_offset + block_data_size, SEEK_SET);
+        write(_fd, (void*) "****", 4);
+        
     }
     
     void Tree::add_key_value(long key, long value) {
