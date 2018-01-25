@@ -14,7 +14,7 @@ namespace Bplusdia {
     
         void persist();
         void init_new(std::string file_name, long block_size, long n_blocks, long b);
-        void set_fd(int fd);
+        void set_fd(int fd) {_fd = fd;}
     
       protected:
       private:

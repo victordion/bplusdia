@@ -21,15 +21,15 @@ class Block {
     void set_parent_id(long parent_id) {
         _parent_id = parent_id;
     }
-    virtual bool oversize();
-    virtual void add_key_value(long key, long value);
-    virtual std::vector<long> get_children_keys();
-    virtual std::vector<long> get_children_ids();
-    virtual std::vector<Block*> get_children_block_ptrs();
+    virtual bool oversize() {return false;}
+    virtual void add_key_value(long key, long value) {}
+    virtual std::vector<long> get_children_keys() {return std::vector<long>();}
+    virtual std::vector<long> get_children_ids() {return std::vector<long>();}
+    virtual std::vector<Block*> get_children_block_ptrs() {return std::vector<Block*>();}
 
   protected:
     // in bytes
-    virtual long size() = 0;
+    virtual long size() {return 0L;}
 
     // Size in bytes
     long _size;
@@ -42,20 +42,20 @@ class Block {
 
 class RootBlock : public Block {
   public:
-    RootBlock();
+    RootBlock() {}
     RootBlock(long self_id) : Block(self_id) {
      
     }
 
-    void add_key_value(long key, long value);
-    void remove_key(long key);
-    long get_child_id_by_key(long key);
+    //void add_key_value(long key, long value) {}
+    void remove_key(long key) {}
+    long get_child_id_by_key(long key) {return 0L;}
 
-    long size();
+    long size() {return 0L;}
     
-    std::vector<long> get_children_keys();
-    std::vector<long> get_children_ids();
-    std::vector<Block*> get_children_block_ptrs();
+    //std::vector<long> get_children_keys();
+    //std::vector<long> get_children_ids();
+    //std::vector<Block*> get_children_block_ptrs();
 
   private:
   

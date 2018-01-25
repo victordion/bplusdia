@@ -7,13 +7,19 @@
 #include <typeinfo>
 #include <string.h>
 #include <cstring>
+#include <stdexcept>
+#include <iostream>
 
 namespace Bplusdia {
     
     Tree::Tree() {
     
     }
-    
+   
+    Tree::~Tree() {
+        close(_fd);
+    }
+ 
     void Tree::init_new(std::string file_name, long block_size, long n_blocks, long b) {
         _b = b;
         _n_blocks = n_blocks;
@@ -22,7 +28,7 @@ namespace Bplusdia {
         _used.resize(_n_blocks);
      
         if (access(file_name.c_str(), F_OK ) != -1) {
-            throw "File exists. Exiting.";
+            throw std::runtime_error("File exists. Exiting.");
         }
 
         _fd = open(file_name.c_str(), O_RDWR | O_CREAT, 0666);
@@ -104,31 +110,32 @@ namespace Bplusdia {
         }
     }
     
-    Tree::~Tree() {
-        close(_fd);
-    }
    
     /*
-     *
+     * Restore a tree from file
      */ 
     Tree* init_from_file(std::string file_name) {
       
         Tree* tree = new Tree();
         
-        int fd = open(file_name.c_str(), O_RDWR);
+        int fd = open(file_name.c_str(), O_RDWR, 0666);
+        if (fd < 0) {
+             throw std::runtime_error("Failed to open" + file_name + "in init_from_file(std::string)");
+        }
+        
         tree->set_fd(fd); 
         
-        char buf[4096];
-        read(fd, (void *) buf, 4096);
+        char buf[8];
+        read(fd, (void *) buf, 8);
+        std::string logo_from_file(buf, 8); 
 
-        
-        char logo[8];
-        memcpy(logo, buf, 8);
-        std::string logo_str(logo, logo + 8);
-
-        if (logo_str != "Bplusdia") {
-            return NULL;
+        std::string logo = "Bplusdia";        
+         
+        if (logo != logo_from_file) {
+            std::cerr << "File logo is " << buf << std::endl;
+            throw std::runtime_error("This is not valid tree file");
         }
+
               
         return tree;
     } 

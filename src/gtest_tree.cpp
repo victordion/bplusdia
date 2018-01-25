@@ -1,4 +1,6 @@
 #include "gtest/gtest.h"
+#include "tree.h"
+#include <stdexcept>
 
 using namespace std;
 
@@ -23,7 +25,19 @@ class TreeTest : public ::testing::Test {
 
 
 TEST_F(TreeTest, Haha) {
-    ASSERT_EQ(0, 0);
+    try {
+        Bplusdia::Tree* tree = new Bplusdia::Tree();
+        string file = "tree.dat";
+        long block_size = 4096L;
+        long n_blocks = 1024L;
+        long b = 5;
+        tree->init_new(file, block_size, n_blocks, b);
+        delete tree;
+        
+        Bplusdia::Tree* recoverd = Bplusdia::init_from_file("tree.dat"); 
+    } catch (const std::exception & e) {
+        std::cerr << e.what() << std::endl;
+    }
 }
 
 // Compile with Google test using
