@@ -28,7 +28,7 @@ namespace Bplusdia {
         _used.resize(_n_blocks);
      
         if (access(file_name.c_str(), F_OK ) != -1) {
-            throw std::runtime_error("File exists. Exiting.");
+            throw std::runtime_error("File " + file_name + " already exists. Exiting.");
         }
 
         _fd = open(file_name.c_str(), O_RDWR | O_CREAT, 0666);
