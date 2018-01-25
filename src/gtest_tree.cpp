@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 #include "tree.h"
 #include <stdexcept>
+#include <stdio.h>
 
 using namespace std;
 
@@ -16,6 +17,7 @@ class TreeTest : public ::testing::Test {
 
     virtual void SetUp()
     {
+        remove("tree.dat");
     }
 
     virtual void TearDown()
@@ -29,11 +31,14 @@ TEST_F(TreeTest, Haha) {
     string file = "tree.dat";
     long block_size = 4096L;
     long n_blocks = 1024L;
-    long b = 5;
+    long b = 5L;
     tree->init_new(file, block_size, n_blocks, b);
     delete tree;
     
-    Bplusdia::Tree* recoverd = Bplusdia::init_from_file("tree.dat"); 
+    Bplusdia::Tree* recovered = Bplusdia::init_from_file("tree.dat");
+    EXPECT_EQ(recovered->get_n_blocks(), 1024L); 
+    EXPECT_EQ(recovered->get_block_size(), 4096L); 
+    EXPECT_EQ(recovered->get_b(), 5L); 
 }
 
 // Compile with Google test using

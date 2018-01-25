@@ -136,7 +136,22 @@ namespace Bplusdia {
             throw std::runtime_error("This is not valid tree file");
         }
 
-              
+        lseek(fd, 16, SEEK_SET);
+        long n_blocks;
+        read(fd, (void*) &n_blocks, 8);
+        tree->set_n_blocks(n_blocks);  
+
+        lseek(fd, 24, SEEK_SET);
+        long block_size;
+        read(fd, (void*) &block_size, 8);
+        tree->set_block_size(block_size);  
+        
+        lseek(fd, 32, SEEK_SET);
+        long b;
+        read(fd, (void*) &b, 8);
+        tree->set_b(b);  
+
+
         return tree;
     } 
 }

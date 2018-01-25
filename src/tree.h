@@ -2,7 +2,6 @@
 #include "block.h"
 #include <string>
 
-
 namespace Bplusdia {
     class Tree {
       public:
@@ -15,7 +14,16 @@ namespace Bplusdia {
         void persist();
         void init_new(std::string file_name, long block_size, long n_blocks, long b);
         void set_fd(int fd) {_fd = fd;}
-    
+        
+        long get_n_blocks() {return _n_blocks;}
+        void set_n_blocks(long n_blocks) {_n_blocks = n_blocks;}
+ 
+        long get_block_size() {return _block_size;}
+        void set_block_size(long block_size) {_block_size = block_size;}
+        
+        long get_b() {return _b;}
+        void set_b(long b) {_b = b;}
+      
       protected:
       private:
           
